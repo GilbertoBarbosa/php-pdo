@@ -35,7 +35,7 @@ class PdoStudentRepository implements StudentRepository
 
     private function hydrateStudentList(\PDOStatement $stmt): array
     {
-        $studentDataList = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $studentDataList = $stmt->fetchAll();
         $studentList = [];
 
         foreach ($studentDataList as $studentData) {
@@ -64,6 +64,10 @@ class PdoStudentRepository implements StudentRepository
                         VALUES (:name, :birth_date);';
 
         $stmt = $this->connection->prepare($insertQuery);
+
+        if ($stmt === false) {
+            throw new \RuntimeException($this->connection->errorInfo()[2]);
+        }
 
         $success = $stmt->execute([
             ':name' => $student->name(),
